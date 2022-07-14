@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin} from 'mongoose-update-if-current';
 
 interface TicketAttrs{
     title: string;
@@ -9,7 +10,10 @@ interface TicketAttrs{
 interface TicketDoc extends mongoose.Document{
     title: string;
     price: number;
-    userId: string
+    userId: string;
+    version: number;
+    orderId?: string; // we are adding orderId so we can lock down a ticket  orderId is optional
+    // when a ticket is first created, the orderId is undefined
 
 }
 
@@ -29,6 +33,9 @@ const ticketSchema = new mongoose.Schema({
     userId:{
         type: String,
         required: true
+    },
+    orderId:{
+        type: String,
     }
 } ,  
     {
@@ -40,6 +47,9 @@ const ticketSchema = new mongoose.Schema({
         }  
     } 
 );
+// tracking version
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (attrs: TicketAttrs) =>{
     return new Ticket(attrs)

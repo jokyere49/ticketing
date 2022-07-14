@@ -21,6 +21,7 @@ it('returns an error if the ticket is already reserved', async () => {
 // now try tp make a request to that same ticket 
 // it shd throw an  badrequesterror because ticket is already reserved
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -45,6 +46,7 @@ it('reserves a ticket', async () => {
   // ticket is not already associated with an order since u just created and added to the database
   // make an order next and see if u get a 201 status
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -60,6 +62,7 @@ it('reserves a ticket', async () => {
 it('emits an order created event', async()=>{
   // creates  the ticket and then the order
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
