@@ -2,6 +2,8 @@ import { Message } from 'node-nats-streaming';
 import { Listener, OrderCreatedEvent, Subjects } from "@jokytickets/common";
 import { queueGroupName } from "./queue-group-name";
 import { Ticket } from "../../models/ticket";
+import { TicketUpdatedPublisher } from '../publishers/ticket-updated-publisher';
+
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent>{
     readonly subject = Subjects.OrderCreated;
@@ -26,6 +28,17 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent>{
 
     // Save the ticket
     await ticket.save();
+
+    // since ticket version is updated bcos of the change in a both when need to publish an event
+    await new TicketUpdatedPublisher(this.client).publish({
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+        version: ticket.version,
+        orderId: ticket.orderId,
+      });
+    
 
     // ack the message
     msg.ack();
