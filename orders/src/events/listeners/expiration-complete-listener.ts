@@ -9,12 +9,16 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     readonly subject = Subjects.ExpirationComplete;
     // queueGroupName allows an event to be sent to only one of  the members in a queue group
     queueGroupName = queueGroupName;
-
+    
     async onMessage(data: ExpirationCompleteEvent['data'], msg: Message ){
             const order = await Order.findById(data.orderId).populate('ticket')
 
             if(!order){
                 throw new Error('Order not found');
+            }
+            // do nothing when we receive an expiration message but the order is already complete
+            if (order.status === OrderStatus.Complete){
+                return msg.ack();
             }
 
             order.set({
