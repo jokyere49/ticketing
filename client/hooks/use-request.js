@@ -1,13 +1,21 @@
 import axios from "axios";
 import { useState } from "react";
 
+// this is used to make request in a react componenet
+// this hook returns a function do Request and errors
+// errors is empty unless there is an errors where u
+// go to the catch statement and the errors become
+// the html defined inside setErrors
 export default ({url, method, body, onSuccess})=>{
     const [ errors, setErrors] =  useState(null);
-
-    const doRequest = async () =>{
+    
+ // takes props and merge with body
+    const doRequest = async (props = {} ) =>{
         try{
           setErrors(null);
-          const response = await axios[method](url, body);
+          const response = await axios[method](url, 
+            {...body, ...props}
+            );
           
           if (onSuccess){
             onSuccess(response.data)
